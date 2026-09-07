@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小马剪辑师作品集 - xiaoma-editor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com"  crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"  rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #e50914;
+            --secondary-color: #ffb800;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #2d2d2d;
+            --border-color: #333333;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-toggle {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* 首屏英雄区 */
+        .hero {
+            height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .hero-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.4;
+            filter: grayscale(20%) contrast(1.1);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            padding: 0 2rem;
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.2rem, 2vw, 1.8rem);
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+
+        .hero-tags {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.8rem;
+            margin-bottom: 3rem;
+        }
+
+        .tag {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1.2rem;
+            border-radius: 2rem;
+            font-size: 0.9rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .hero-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            border-radius: 0.3rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--text-primary);
+        }
+
+        .btn-primary:hover {
+            background-color: #c10710;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--text-primary);
+            border: 2px solid var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--text-secondary);
+            border: 2px solid var(--text-secondary);
+        }
+
+        .btn-outline:hover {
+            color: var(--text-primary);
+            border-color: var(--text-primary);
+        }
+
+        /* 通用区块样式 */
+        .section {
+            padding: 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: clamp(1.8rem, 3vw, 2.5rem);
+            font-weight: 700;
+            margin-bottom: 3rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background-color: var(--primary-color);
+        }
+
+        /* 精选项目 */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .project-card {
+            background-color: var(--bg-secondary);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .project-thumbnail {
+            position: relative;
+            aspect-ratio: 16/9;
+            overflow: hidden;
+        }
+
+        .project-cover {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .project-card:hover .project-cover {
+            transform: scale(1.05);
+        }
+
+        .play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .play-button::after {
+            content: '';
+            width: 0;
+            height: 0;
+            border-top: 12px solid transparent;
+            border-bottom: 12px solid transparent;
+            border-left: 20px solid var(--text-primary);
+            margin-left: 3px;
+        }
+
+        .project-card:hover .play-button {
+            background-color: var(--primary-color);
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .project-info {
+            padding: 1.5rem;
+        }
+
+        .project-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .project-type {
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .project-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .project-role {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* 项目详情模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            max-width: 900px;
+            width: 100%;
+            background-color: var(--bg-secondary);
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close-modal {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: color 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: var(--text-primary);
+        }
+
+        .modal-video-container {
+            position: relative;
+            aspect-ratio: 16/9;
+        }
+
+        .modal-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .modal-details {
+            padding: 2rem;
+        }
+
+        .modal-description {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .meta-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .meta-value {
+            font-weight: 500;
+        }
+
+        /* 关于我 */
+        .about-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .about-image {
+            border-radius: 0.5rem;
+            overflow: hidden;
+            aspect-ratio: 3/4;
+        }
+
+        .about-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .about-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .about-content p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        /* 工作经历 */
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 100%;
+            background-color: var(--border-color);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 3rem;
+            display: flex;
+        }
+
+        .timeline-item:nth-child(odd) {
+            flex-direction: row-reverse;
+        }
+
+        .timeline-content {
+            width: 45%;
+            background-color: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .timeline-item:hover .timeline-content {
+            transform: translateY(-5px);
+        }
+
+        .timeline-date {
+            color: var(--secondary-color);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-company {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .timeline-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 16px;
+            height: 16px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            border: 4px solid var(--bg-primary);
+            z-index: 1;
+        }
+
+        /* 技能 */
+        .skills-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .skill-category {
+            background-color: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: 0.5rem;
+        }
+
+        .skill-category h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            color: var(--secondary-color);
+        }
+
+        .skill-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        .skill-item {
+            background-color: var(--bg-tertiary);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .skill-item:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        /* 简历 */
+        .resume-container {
+            background-color: var(--bg-secondary);
+            padding: 3rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+
+        .resume-preview {
+            width: 100%;
+            max-width: 800px;
+            height: 500px;
+            background-color: var(--bg-tertiary);
+            border-radius: 0.5rem;
+            margin: 2rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+        }
+
+        /* 联系方式 */
+        .contact-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            text-align: center;
+        }
+
+        .contact-item {
+            background-color: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .contact-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .contact-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .contact-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-value {
+            color: var(--text-secondary);
+        }
+
+        .contact-value a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .contact-value a:hover {
+            color: var(--primary-color);
+        }
+
+        /* 页脚 */
+        .footer {
+            background-color: var(--bg-secondary);
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* 视频控制 */
+        .video-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            z-index: 3;
+        }
+
+        .control-btn {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .control-btn:hover {
+            color: var(--primary-color);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                left: -100%;
+                width: 100%;
+                height: calc(100vh - 70px);
+                background-color: var(--bg-secondary);
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: center;
+                padding-top: 2rem;
+                transition: left 0.3s ease;
+            }
+
+            .nav-links.active {
+                left: 0;
+            }
+
+            .nav-toggle {
+                display: block;
+            }
+
+            .hero {
+                height: auto;
+                min-height: 100vh;
+                padding: 8rem 0 4rem;
+            }
+
+            .about-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .timeline::before {
+                left: 20px;
+            }
+
+            .timeline-item {
+                flex-direction: column !important;
+                padding-left: 50px;
+            }
+
+            .timeline-content {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+
+            .timeline-dot {
+                left: 20px;
+            }
+
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .resume-container {
+                padding: 2rem 1rem;
+            }
+
+            .resume-preview {
+                height: 300px;
+            }
+        }
+
+        /* 懒加载 */
+        .lazy {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .lazy.loaded {
+            opacity: 1;
+        }
+
+        /* 滚动动画 */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="nav-logo">小马剪辑师</a>
+            <ul class="nav-links">
+                <li><a href="#hero">首页</a></li>
+                <li><a href="#projects">项目作品</a></li>
+                <li><a href="#about">关于我</a></li>
+                <li><a href="#experience">工作经历</a></li>
+                <li><a href="#skills">专业技能</a></li>
+                <li><a href="#resume">简历</a></li>
+                <li><a href="#contact">联系方式</a></li>
+            </ul>
+            <div class="nav-toggle" id="navToggle">☰</div>
+        </div>
+    </nav>
+
+    <!-- 首屏英雄区 -->
+    <section id="hero" class="hero">
+        <video class="hero-video" id="heroVideo" muted autoplay loop playsinline>
+            <source src="https://assets.example.com/hero-reel.mp4"  type="video/mp4">
+        </video>
+        <div class="hero-content">
+            <h1 class="hero-title">小马</h1>
+            <p class="hero-subtitle">资深剪辑师 | 视觉故事创作者</p>
+            <div class="hero-tags">
+                <span class="tag">商业广告</span>
+                <span class="tag">纪录片</span>
+                <span class="tag">微电影</span>
+                <span class="tag">短视频</span>
+                <span class="tag">MV</span>
+            </div>
+            <div class="hero-buttons">
+                <a href="#projects" class="btn btn-primary">观看作品</a>
+                <a href="#projects" class="btn btn-secondary">查看项目</a>
+                <a href="#resume" class="btn btn-outline">下载简历</a>
+            </div>
+        </div>
+        <div class="video-controls">
+            <button class="control-btn" id="playPauseBtn">⏯️</button>
+            <button class="control-btn" id="muteBtn">🔊</button>
+            <button class="control-btn" id="fullscreenBtn">⛶</button>
+        </div>
+    </section>
+
+    <!-- 精选项目 -->
+    <section id="projects" class="section">
+        <h2 class="section-title">精选项目</h2>
+        <div class="projects-grid">
+            <!-- 项目1 -->
+            <div class="project-card" data-project-id="1">
+                <div class="project-thumbnail">
+                    <img src="./1.jpg"  alt="项目封面" class="project-cover lazy">
+                    <div class="play-button"></div>
+                </div>
+                <div class="project-info">
+                    <h3 class="project-title">电影解说：哪吒之魔童降世</h3>
+                    <p class="project-type">影视解说 / 3分钟</p>
+                    <p class="project-description">深度拆解《哪吒》动画电影叙事脉络，解析镜头语言、人物成长弧光，梳理剧情冲突与内核主题，完成剪辑、字幕包装、节奏把控，输出完整影视解说成片。</p>
+                    <p class="project-role">我的职责：剪辑师 / 文案剪辑</p>
+                </div>
+            </div>
+
+            <!-- 项目2 -->
+            <div class="project-card" data-project-id="2">
+                <div class="project-thumbnail">
+                    <img src="./2.jpg"  alt="项目封面" class="project-cover lazy">
+                    <div class="play-button"></div>
+                </div>
+                <div class="project-info">
+                    <h3 class="project-title">宣传片：重庆城市宣传片</h3>
+                    <p class="project-type">城市宣传片 / 2分钟</p>
+                    <p class="project-description">融合重庆山城地貌、市井烟火与现代都市风貌，串联地标、人文夜景镜头，搭配配乐与VO旁白，展现重庆独有的城市气质，完成剪辑调色与音效包装。</p>
+                    <p class="project-role">我的职责：剪辑师</p>
+                </div>
+            </div>
+
+            <!-- 项目3 -->
+            <div class="project-card" data-project-id="3">
+                <div class="project-thumbnail">
+                    <img src="./3.jpg"  alt="项目封面" class="project-cover lazy">
+                    <div class="play-button"></div>
+                </div>
+                <div class="project-info">
+                    <h3 class="project-title">广告：AI香水广告</h3>
+                    <p class="project-type">商业广告 / 10秒</p>
+                    <p class="project-description">AI辅助生成香水氛围感视觉镜头，围绕香水意向构建短片叙事，结合产品实拍素材，完成信息流广告剪辑、花字包装、音效配乐，打造高级感香水商业短片。</p>
+                    <p class="project-role">我的职责：剪辑师 / 后期包装</p>
+                </div>
+            </div>
+
+            <!-- 项目4 -->
+            <div class="project-card" data-project-id="4">
+                <div class="project-thumbnail">
+                    <img src="./4.jpg"  alt="项目封面" class="project-cover lazy">
+                    <div class="play-button"></div>
+                </div>
+                <div class="project-info">
+                    <h3 class="project-title">混剪：白蛇动画电影混剪</h3>
+                    <p class="project-type">影视混剪 / 20秒</p>
+                    <p class="project-description">选取《白蛇》系列动画名场面，以情感故事线重组镜头，把控情绪节奏，搭配适配BGM，通过转场、调色烘托国风氛围感，完成高完成度混剪作品。</p>
+                    <p class="project-role">我的职责：剪辑师 / 音效设计</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 项目详情模态框 -->
+    <div class="modal" id="projectModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">项目标题</h3>
+                <div class="close-modal" id="closeModal">×</div>
+            </div>
+            <div class="modal-video-container">
+                <video class="modal-video" id="modalVideo" controls playsinline>
+                    <source src="" type="video/mp4">
+                </video>
+            </div>
+            <div class="modal-details">
+                <p id="modalDescription">项目描述</p>
+                <div class="modal-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">项目类型</span>
+                        <span id="modalType" class="meta-value"></span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">时长</span>
+                        <span id="modalDuration" class="meta-value"></span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">客户</span>
+                        <span id="modalClient" class="meta-value"></span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">我的职责</span>
+                        <span id="modalRole" class="meta-value"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 关于我 -->
+    <section id="about" class="section">
+        <h2 class="section-title">关于我</h2>
+        <div class="about-container">
+            <div class="about-image">
+                <img src="https://assets.example.com/profile.jpg"  alt="个人照片" class="lazy">
+            </div>
+            <div class="about-content">
+                <h3>用镜头讲述故事，用剪辑赋予生命</h3>
+                <p>我是一名拥有5年专业经验的剪辑师，专注于各种剪辑，不限于商业广告剪辑、影视混剪、三维场景视觉创作、短视频创作、口播、信息流。具备视频剪辑、调色音效、AI视觉辅助创作、3D建模综合能力，拥有校园宣传、短片广告、短视频信息流项目实操经验。</p>
+                <p>我坚信剪辑不仅是技术，更是艺术。通过精准的节奏把控、细腻的情感表达和独特的视觉语言，我致力于将每一个故事都展现得淋漓尽致。</p>
+                <p>擅长运用光影、色彩和音效营造氛围，注重细节打磨，追求完美的视觉呈现。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 工作经历 -->
+    <section id="experience" class="section">
+        <h2 class="section-title">工作经历</h2>
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="timeline-date">2025</div>
+                    <h3 class="timeline-title">运营剪辑实习生</h3>
+                    <p class="timeline-company">传媒</p>
+                    <p class="timeline-description">参与短视频、信息流广告后期制作，完成素材整理、粗剪精剪、调色音效、字幕包装等工作；配合团队完成脚本拆解，输出多条短视频成片，优化视频节奏，提升内容观感。</p>
+                </div>
+                <div class="timeline-dot"></div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="timeline-date">2024</div>
+                    <h3 class="timeline-title">剪辑师</h3>
+                    <p class="timeline-company">工作室影视方向</p>
+                    <p class="timeline-description">负责活动宣传物料产出，承担通讯稿件撰写、活动视频拍摄剪辑、海报视觉设计；完成宣传片、活动纪实短片制作，统筹素材归档，配合完成各类新媒体宣传项目。</p>
+                </div>
+                <div class="timeline-dot"></div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="timeline-date">2026</div>
+                    <h3 class="timeline-title">剪辑助理</h3>
+                    <p class="timeline-company">个人接单</p>
+                    <p class="timeline-description">协助资深剪辑师完成各类节目剪辑工作，学习专业剪辑技巧和流程，积累丰富的行业经验。</p>
+                </div>
+                <div class="timeline-dot"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 专业技能 -->
+    <section id="skills" class="section">
+        <h2 class="section-title">专业技能与软件</h2>
+        <div class="skills-container">
+            <div class="skill-category">
+                <h3>剪辑软件</h3>
+                <div class="skill-list">
+                    <span class="skill-item">Adobe Premiere Pro</span>
+                    <span class="skill-item">Final Cut Pro X</span>
+                    <span class="skill-item">DaVinci Resolve</span>
+                    <span class="skill-item">剪映专业版</span>
+                </div>
+            </div>
+
+            <div class="skill-category">
+                <h3>后期制作</h3>
+                <div class="skill-list">
+                    <span class="skill-item">色彩校正</span>
+                    <span class="skill-item">音效设计</span>
+                    <span class="skill-item">字幕制作</span>
+                    <span class="skill-item">特效合成</span>
+                </div>
+            </div>
+
+            <div class="skill-category">
+                <h3>专业能力</h3>
+                <div class="skill-list">
+                    <span class="skill-item">故事叙事</span>
+                    <span class="skill-item">节奏把控</span>
+                    <span class="skill-item">镜头语言</span>
+                    <span class="skill-item">团队协作</span>
+                </div>
+            </div>
+
+            <div class="skill-category">
+                <h3>其他工具</h3>
+                <div class="skill-list">
+                    <span class="skill-item">Adobe After Effects</span>
+                    <span class="skill-item">Adobe Photoshop</span>
+                    <span class="skill-item">Audition</span>
+                    <span class="skill-item">Media Encoder</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 简历 -->
+    <section id="resume" class="section">
+        <h2 class="section-title">个人简历</h2>
+        <div class="resume-container">
+            <div class="resume-preview">
+                <p>简历预览区域</p>
+            </div>
+            <a href="./简历.png"  class="btn btn-primary" download>下载完整简历</a>
+        </div>
+    </section>
+
+    <!-- 联系方式 -->
+    <section id="contact" class="section">
+        <h2 class="section-title">联系方式</h2>
+        <div class="contact-container">
+            <div class="contact-item">
+                <div class="contact-icon">📧</div>
+                <h3 class="contact-title">邮箱</h3>
+                <p class="contact-value"><a href="mailto:2839954304@qq.com">2839954304@qq.com</a></p>
+            </div>
+
+            <div class="contact-item">
+                <div class="contact-icon">📱</div>
+                <h3 class="contact-title">电话</h3>
+                <p class="contact-value"><a href="tel:暂空">暂空</a></p>
+            </div>
+
+            <div class="contact-item">
+                <div class="contact-icon">📍</div>
+                <h3 class="contact-title">地址</h3>
+                <p class="contact-value">暂空</p>
+            </div>
+
+            <div class="contact-item">
+                <div class="contact-icon">💼</div>
+                <h3 class="contact-title">社交媒体</h3>
+                <p class="contact-value">
+                    <a href="#" target="_blank">抖音</a> | 
+                    <a href="#" target="_blank">B站</a> | 
+                    <a href="#" target="_blank">Behance</a>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <p class="footer-text">© 2026 小马剪辑师作品集 | xiaoma-editor.com</p>
+    </footer>
+
+    <script>
+        // 导航栏切换
+        const navToggle = document.getElementById('navToggle');
+        const navLinks = document.querySelector('.nav-links');
+
+        navToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            navToggle.textContent = navLinks.classList.contains('active') ? '×' : '☰';
+        });
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    navLinks.classList.remove('active');
+                    navToggle.textContent = '☰';
+                }
+            });
+        });
+
+        // 视频控制
+        const heroVideo = document.getElementById('heroVideo');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const muteBtn = document.getElementById('muteBtn');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+        playPauseBtn.addEventListener('click', () => {
+            if (heroVideo.paused) {
+                heroVideo.play();
+                playPauseBtn.textContent = '⏸️';
+            } else {
+                heroVideo.pause();
+                playPauseBtn.textContent = '▶️';
+            }
+        });
+
+        muteBtn.addEventListener('click', () => {
+            heroVideo.muted = !heroVideo.muted;
+            muteBtn.textContent = heroVideo.muted ? '🔇' : '🔊';
+        });
+
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                heroVideo.requestFullscreen().catch(err => {
+                    console.log(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+        // 项目模态框
+        const projectModal = document.getElementById('projectModal');
+        const closeModal = document.getElementById('closeModal');
+        const modalVideo = document.getElementById('modalVideo');
+        const projectCards = document.querySelectorAll('.project-card');
+
+        // 项目数据（请根据实际内容修改）
+        const projectsData = {
+            1: {
+                title: '电影解说：哪吒之魔童降世',
+                description: '深度拆解《哪吒》动画电影叙事脉络，解析镜头语言、人物成长弧光，梳理剧情冲突与内核主题，完成剪辑、字幕包装、节奏把控，输出完整影视解说成片。',
+                type: '影视解说',
+                duration: '3分钟',
+                client: '职责',
+                role: '剪辑师 / 文案剪辑',
+                videoUrl: './1.mp4' 
+            },
+            2: {
+                title: '宣传片：重庆城市宣传片',
+                description: '融合重庆山城地貌、市井烟火与现代都市风貌，串联地标、人文夜景镜头，搭配配乐与VO旁白，展现重庆独有的城市气质，完成剪辑调色与音效包装。',
+                type: '城市宣传片',
+                duration: '2分钟',
+                client: '职责',
+                role: '剪辑师 ',
+                videoUrl: './2.mp4' 
+            },
+            3: {
+                title: '广告：AI香水广告',
+                description: 'AI辅助生成香水氛围感视觉镜头，围绕香水意向构建短片叙事，结合产品实拍素材，完成信息流广告剪辑、花字包装、音效配乐、打造高级感香水商业短片。',
+                type: '商业广告',
+                duration: '10秒',
+                client: '职责',
+                role: '剪辑师 / 后期包装',
+                videoUrl: './3.mp4' 
+            },
+            4: {
+                title: '混剪：白蛇动画电影混剪',
+                description: '选取《白蛇》系列动画名场面，以情感故事线重组镜头，把控情绪节奏，搭配适配BGM，通过转场、调色烘托国风氛围感，完成高完成度混剪作品。',
+                type: '混剪',
+                duration: '20秒',
+                client: '平台',
+                role: '剪辑师 / 音效设计',
+                videoUrl: './4.mp4' 
+            }
+        };
+
+        projectCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const projectId = card.getAttribute('data-project-id');
+                const project = projectsData[projectId];
+                
+                document.getElementById('modalTitle').textContent = project.title;
+                document.getElementById('modalDescription').textContent = project.description;
+                document.getElementById('modalType').textContent = project.type;
+                document.getElementById('modalDuration').textContent = project.duration;
+                document.getElementById('modalClient').textContent = project.client;
+                document.getElementById('modalRole').textContent = project.role;
+                
+                modalVideo.src = project.videoUrl;
+                projectModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+        });
+
+        closeModal.addEventListener('click', () => {
+            projectModal.classList.remove('active');
+            modalVideo.pause();
+            modalVideo.src = '';
+            document.body.style.overflow = 'auto';
+        });
+
+        // 点击模态框外部关闭
+        projectModal.addEventListener('click', (e) => {
+            if (e.target === projectModal) {
+                closeModal.click();
+            }
+        });
+
+        // 自动暂停其他视频
+        document.addEventListener('play', (e) => {
+            const videos = document.querySelectorAll('video');
+            videos.forEach(video => {
+                if (video !== e.target && !video.paused) {
+                    video.pause();
+                }
+            });
+        }, true);
+
+        // 懒加载
+        const lazyLoad = () => {
+            const lazyElements = document.querySelectorAll('.lazy');
+            
+            lazyElements.forEach(element => {
+                const rect = element.getBoundingClientRect();
+                if (rect.top <= window.innerHeight && rect.bottom >= 0) {
+                    element.src = element.getAttribute('src');
+                    element.classList.add('loaded');
+                }
+            });
+        };
+
+        // 初始加载
+        window.addEventListener('load', lazyLoad);
+        // 滚动加载
+        window.addEventListener('scroll', lazyLoad);
+
+        // 滚动动画
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        // 为需要动画的元素添加观察
+        document.querySelectorAll('.section > *').forEach(element => {
+            element.classList.add('fade-in');
+            observer.observe(element);
+        });
+
+        // 移动端触摸播放
+        if ('ontouchstart' in window) {
+            document.querySelectorAll('.project-card').forEach(card => {
+                card.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    card.click();
+                });
+            });
+        }
+
+        // 页面加载完成后的初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 确保视频在微信浏览器中正常播放
+            if (/MicroMessenger/i.test(navigator.userAgent)) {
+                heroVideo.muted = true;
+                heroVideo.play().catch(() => {
+                    // 微信浏览器可能需要用户交互才能播放
+                    heroVideo.pause();
+                });
+            }
+        });
+    </script>
+</body>
+</html>
